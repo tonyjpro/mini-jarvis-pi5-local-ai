@@ -1,0 +1,202 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2867
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica-Bold;\f1\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\margl1080\margr1080\margb1080\margt1080\vieww26300\viewh23340\viewkind0
+\deftab720
+\pard\pardeftab720\sa180\partightenfactor0
+
+\f0\b\fs36 \cf0 Mini Jarvis - Phase 17R-D3 Storage Stability Addendum
+\f1\b0 \
+\pard\pardeftab720\sa120\partightenfactor0
+\cf0 Project: Mini Jarvis\
+Owner: Tony Provenzano\
+Platform: Raspberry Pi 5 Model B Rev 1.1, 16GB RAM\
+Operating System: Debian GNU/Linux 13, trixie\
+Addendum Date: May 1, 2026\
+Phase Status: COMPLETE / PASSED\
+\pard\pardeftab720\sa180\partightenfactor0
+
+\f0\b \cf0 1. Purpose of This Addendum
+\f1\b0 \
+\pard\pardeftab720\sa120\partightenfactor0
+\cf0 This addendum documents the storage stability issue discovered after Phase 17R and the corrective action applied in Phase 17R-D3. It should be appended to the Mini Jarvis canonical documentation and included in the future public GitHub documentation package for all readers.\
+The issue was not caused by the Mini Jarvis GUI, Ollama, conversation logging permissions, or the language model. The evidence pointed to USB SSD instability involving the JMicron USB-to-SATA bridge used by the boot drive.\
+\pard\pardeftab720\sa180\partightenfactor0
+
+\f0\b \cf0 2. Phase Title
+\f1\b0 \
+\pard\pardeftab720\sa120\partightenfactor0
+\cf0 Phase 17R-D3 - USB SSD UAS Stability Patch\
+Purpose: Disable UAS for the JMicron SSD bridge so the Raspberry Pi 5 uses the more stable usb-storage driver path for the boot SSD.\
+\pard\pardeftab720\sa180\partightenfactor0
+
+\f0\b \cf0 3. Problem Observed
+\f1\b0 \
+\pard\pardeftab720\sa120\partightenfactor0
+\cf0 After Mini Jarvis was left running overnight in Fast mode, the system produced a non-fatal conversation logging warning:\
+\pard\pardeftab720\li360\sa120\partightenfactor0
+\cf0 [Warning: conversation log was not saved: [Errno 5] Input/output error: '/home/minijarvis/minijarvis/logs/conversations']\
+\pard\pardeftab720\sa120\partightenfactor0
+\cf0 Because of the earlier Phase 17R non-fatal logging patch, Mini Jarvis still returned an answer instead of failing the user interaction. However, additional symptoms showed that the problem was broader than the logging function.\
+\pard\pardeftab720\li360\fi-180\sa80\partightenfactor0
+\cf0 \'95	Mini Jarvis GUI remained partially visible and could still accept some typed input.\
+\'95	Mouse movement worked, but some desktop menus and dropdowns became non-responsive.\
+\'95	The desktop background and menu bar degraded or disappeared during interaction.\
+\'95	SSH connections from the Mac mini timed out or failed while the Pi was in the degraded state.\
+\'95	The system later displayed a boot halt screen during recovery, then booted correctly after a reboot.\
+\'95	The boot halt suggested storage or boot-file access instability rather than an application-only failure.\
+\pard\pardeftab720\sa180\partightenfactor0
+
+\f0\b \cf0 4. Initial Concern: Was Logging Broken?
+\f1\b0 \
+\pard\pardeftab720\sa120\partightenfactor0
+\cf0 The first question was whether conversation logging had ever worked and whether the log folder had a permissions problem. This was ruled out.\
+\pard\pardeftab720\li360\fi-180\sa80\partightenfactor0
+\cf0 \'95	The conversation log folder existed at /home/minijarvis/minijarvis/logs/conversations/.\
+\'95	Existing conversation logs were found for April 29, April 30, and May 1.\
+\'95	A May 1 conversation log successfully contained a Fast-mode test question and Mini Jarvis answer.\
+\'95	A direct log write test passed after reboot.\
+\'95	Directory ownership and permissions were correct for the minijarvis user.\
+\'95	The root filesystem was mounted read/write after reboot.\
+\pard\pardeftab720\sa120\partightenfactor0
+\cf0 Conclusion: conversation logging works. The Errno 5 warning was a symptom of temporary storage I/O failure, not a logging-code or permissions failure.\
+\pard\pardeftab720\sa180\partightenfactor0
+
+\f0\b \cf0 5. Evidence Collected
+\f1\b0 \
+\pard\pardeftab720\sa120\partightenfactor0
+\cf0 The post-reboot diagnostic identified the USB SSD bridge as a JMicron device:\
+\pard\pardeftab720\li360\sa120\partightenfactor0
+\cf0 Bus 003 Device 003: ID 152d:0562 JMicron Technology Corp. / JMicron USA Technology Corp. JMS567 SATA 6Gb/s bridge\
+\pard\pardeftab720\sa120\partightenfactor0
+\cf0 The kernel log showed repeated UAS command aborts and a USB storage reset:\
+\pard\pardeftab720\li360\sa120\partightenfactor0
+\cf0 sd 0:0:0:0: [sda] tag#24 uas_eh_abort_handler ...\
+scsi host0: uas_eh_device_reset_handler start\
+usb 3-2: reset high-speed USB device number 3 using xhci-hcd\
+scsi host0: uas_eh_device_reset_handler success\
+\pard\pardeftab720\sa120\partightenfactor0
+\cf0 These messages indicate instability in the USB Attached SCSI path for the SSD bridge. This class of issue can manifest as intermittent I/O errors, system stalls, desktop degradation, SSH loss, and boot instability.\
+\pard\pardeftab720\sa180\partightenfactor0
+
+\f0\b \cf0 6. What Was Ruled Out
+\f1\b0 \
+\pard\pardeftab720\li360\fi-180\sa80\partightenfactor0
+\cf0 \'95	Not a Mini Jarvis GUI logic failure.\
+\'95	Not an Ollama model failure.\
+\'95	Not a Qwen2.5 or Qwen3 model-selection issue.\
+\'95	Not a conversation logging permission problem.\
+\'95	Not a missing log directory problem.\
+\'95	Not a full disk problem. Disk usage remained around 9 percent.\
+\'95	Not a root filesystem read-only state after reboot. The root filesystem remounted read/write.\
+\pard\pardeftab720\sa180\partightenfactor0
+
+\f0\b \cf0 7. Diagnosis
+\f1\b0 \
+\pard\pardeftab720\sa120\partightenfactor0
+\cf0 Root cause class: USB SSD / JMicron UAS instability.\
+The boot SSD is attached through a JMicron JMS567 SATA bridge with USB vendor/product ID 152d:0562. The Linux kernel initially used UAS for this device. The observed uas_eh_abort_handler and device reset messages indicate that the UAS path was unstable for this hardware combination on the Raspberry Pi 5.\
+Corrective strategy: force this specific USB storage bridge to ignore UAS and use the older, more conservative usb-storage driver instead. This may reduce peak disk performance slightly, but it is usually preferable for appliance reliability. Mini Jarvis does not require maximum SSD throughput during normal operation.\
+\pard\pardeftab720\sa180\partightenfactor0
+
+\f0\b \cf0 8. Patch Applied
+\f1\b0 \
+\pard\pardeftab720\sa120\partightenfactor0
+\cf0 File changed:\
+\pard\pardeftab720\li360\sa120\partightenfactor0
+\cf0 /boot/firmware/cmdline.txt\
+\pard\pardeftab720\sa120\partightenfactor0
+\cf0 Kernel command-line parameter added:\
+\pard\pardeftab720\li360\sa120\partightenfactor0
+\cf0 usb-storage.quirks=152d:0562:u\
+\pard\pardeftab720\sa120\partightenfactor0
+\cf0 Final cmdline.txt content after patch:\
+\pard\pardeftab720\li360\sa120\partightenfactor0
+\cf0 console=serial0,115200 console=tty1 root=PARTUUID=3ad44b93-02 rootfstype=ext4 fsck.repair=yes rootwait quiet splash plymouth.ignore-serial-consoles ds=nocloud;i=rpi-imager-1777416695538 cfg80211.ieee80211_regdom=US usb-storage.quirks=152d:0562:u\
+\pard\pardeftab720\sa180\partightenfactor0
+
+\f0\b \cf0 9. Backup Created
+\f1\b0 \
+\pard\pardeftab720\sa120\partightenfactor0
+\cf0 Before modifying cmdline.txt, a backup was created:\
+\pard\pardeftab720\li360\sa120\partightenfactor0
+\cf0 /boot/firmware/cmdline.txt.bak_phase17rd3_20260501_110508\
+\pard\pardeftab720\sa120\partightenfactor0
+\cf0 This backup preserves the pre-patch boot command line in case rollback is needed.\
+\pard\pardeftab720\sa180\partightenfactor0
+
+\f0\b \cf0 10. Verification After Reboot
+\f1\b0 \
+\pard\pardeftab720\sa120\partightenfactor0
+\cf0 After applying the patch, Mini Jarvis was rebooted. The system booted successfully and the GUI answered a Fast-mode question correctly.\
+The active kernel command line confirmed the patch was loaded:\
+\pard\pardeftab720\li360\sa120\partightenfactor0
+\cf0 usb-storage.quirks=152d:0562:u\
+\pard\pardeftab720\sa120\partightenfactor0
+\cf0 The kernel confirmed that UAS was ignored for the JMicron bridge and usb-storage was used instead:\
+\pard\pardeftab720\li360\sa120\partightenfactor0
+\cf0 usb 3-2: UAS is ignored for this device, using usb-storage instead\
+usb-storage 3-2:1.0: USB Mass Storage device detected\
+usb-storage 3-2:1.0: Quirks match for vid 152d pid 0562: 800000\
+scsi host0: usb-storage 3-2:1.0\
+\pard\pardeftab720\sa120\partightenfactor0
+\cf0 A direct log write test also passed after the patch:\
+\pard\pardeftab720\li360\sa120\partightenfactor0
+\cf0 direct post quirk write test at Fri 1 May 11:18:29 CDT 2026\
+WRITE TEST PASS\
+\pard\pardeftab720\sa180\partightenfactor0
+
+\f0\b \cf0 11. Final Phase Result
+\f1\b0 \
+\pard\pardeftab720\li360\fi-180\sa80\partightenfactor0
+\cf0 \'95	JMicron SSD bridge identified: PASS\
+\'95	UAS instability confirmed: PASS\
+\'95	cmdline.txt backup created: PASS\
+\'95	usb-storage quirk added: PASS\
+\'95	Mini Jarvis rebooted correctly: PASS\
+\'95	Mini Jarvis GUI launched: PASS\
+\'95	Fast-mode answer worked: PASS\
+\'95	Kernel confirmed UAS ignored for this device: PASS\
+\'95	Direct conversation-log write test passed: PASS\
+\pard\pardeftab720\sa120\partightenfactor0
+\cf0 Final status: Phase 17R-D3 COMPLETE / PASSED.\
+\pard\pardeftab720\sa180\partightenfactor0
+
+\f0\b \cf0 12. Current Operating Interpretation
+\f1\b0 \
+\pard\pardeftab720\sa120\partightenfactor0
+\cf0 The original logging warning should now be understood as a storage-path symptom. Phase 17R made the logging layer non-fatal so the user still received an answer. Phase 17R-D3 addressed the likely root cause by disabling UAS for the unstable JMicron USB storage bridge.\
+The log folder remains:\
+\pard\pardeftab720\li360\sa120\partightenfactor0
+\cf0 /home/minijarvis/minijarvis/logs/conversations/\
+\pard\pardeftab720\sa120\partightenfactor0
+\cf0 Daily logs remain named:\
+\pard\pardeftab720\li360\sa120\partightenfactor0
+\cf0 conversation_YYYY-MM-DD.txt\
+\pard\pardeftab720\sa120\partightenfactor0
+\cf0 Retention policy remains 60 days.\
+\pard\pardeftab720\sa180\partightenfactor0
+
+\f0\b \cf0 13. Monitoring Recommendation
+\f1\b0 \
+\pard\pardeftab720\sa120\partightenfactor0
+\cf0 After Phase 17R-D3, Mini Jarvis should be allowed to run normally on Fast mode for an overnight stability watch. The following will be checked the next day:\
+\pard\pardeftab720\li360\fi-180\sa80\partightenfactor0
+\cf0 \'95	Mini Jarvis remains responsive.\
+\'95	Mouse and desktop menus remain normal.\
+\'95	SSH by hostname still works.\
+\'95	Conversation logging continues to work.\
+\'95	No new UAS aborts or USB device resets appear in dmesg.\
+\'95	No new Errno 5 input/output error appears in the GUI.\
+\pard\pardeftab720\sa180\partightenfactor0
+
+\f0\b \cf0 14. Rollback Note
+\f1\b0 \
+\pard\pardeftab720\sa120\partightenfactor0
+\cf0 Rollback should not be performed unless the usb-storage quirk causes a new problem. If rollback is required, restore the backed-up cmdline.txt or remove only the following parameter from /boot/firmware/cmdline.txt:\
+\pard\pardeftab720\li360\sa120\partightenfactor0
+\cf0 usb-storage.quirks=152d:0562:u\
+\pard\pardeftab720\sa120\partightenfactor0
+\cf0 After rollback, reboot is required for the change to take effect.\
+}

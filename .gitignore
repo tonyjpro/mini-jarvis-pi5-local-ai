@@ -1,0 +1,53 @@
+# macOS metadata
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Python cache/build artifacts
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+build/
+dist/
+*.egg-info/
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# Logs and runtime files
+logs/
+*.log
+runtime/
+*.tmp
+*.temp
+
+# Secrets and private material
+.env
+*.pem
+*.key
+id_rsa
+id_rsa.pub
+id_ed25519
+id_ed25519.pub
+.ssh/
+
+# Ollama models and large local model data
+models/
+.ollama/
+*.gguf
+*.safetensors
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Local OS trash/cache
+.Trashes/
+.Spotlight-V100/
+.fseventsd/

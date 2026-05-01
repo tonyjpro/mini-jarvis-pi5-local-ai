@@ -1,0 +1,378 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2867
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Arial-BoldMT;\f1\fswiss\fcharset0 ArialMT;\f2\fmodern\fcharset0 CourierNewPSMT;
+}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue0;}
+{\*\expandedcolortbl;;\cssrgb\c0\c0\c0;}
+\margl1440\margr1440
+\deftab720
+\pard\pardeftab720\partightenfactor0
+
+\f0\b\fs32 \cf2 \up0 \nosupersub \ulnone Mini Jarvis - Key Files Explained (Current Post Phase 17R)\
+\pard\pardeftab720\partightenfactor0
+
+\f1\b0 \cf2 Authoritative plain-English guide to the important Mini Jarvis files and how they connect.\
+\pard\pardeftab720\partightenfactor0
+
+\f0\b \cf2 Current State: Stable local AI appliance after Phase 17R\
+\
+All of your important project files live in:\
+\pard\pardeftab720\partightenfactor0
+
+\f2\b0\fs20 \cf2 /home/minijarvis/minijarvis\
+\
+\pard\pardeftab720\partightenfactor0
+
+\f0\b\fs26 \cf2 1. Core Application\
+jarvis_ui.py\
+\pard\pardeftab720\partightenfactor0
+
+\f1\b0 \cf2 Purpose:\
+This is the main application.\
+It handles:\
+- GUI window, input box, output display, and overall Tkinter layout\
+- Sending prompts to the local AI through the Ollama HTTP API\
+- Streaming responses back into the UI\
+- Conversation memory\
+- /clear command\
+- Send button and Enter-to-send behavior\
+- Duplicate-send protection while a response is generating\
+- Model dropdown for Fast and Deep model selection\
+- Status bar showing Ready or Thinking plus the selected model\
+- Conversation logging\
+- 60-day log cleanup\
+- Model metadata in conversation logs\
+- Qwen3 thinking suppression through API payload think=False\
+- Phase 17R non-fatal logging protection\
+\pard\pardeftab720\partightenfactor0
+
+\f0\b \cf2 If something feels wrong in GUI behavior, response behavior, model selection, logging, or display behavior, this is usually the first file to inspect.\
+\
+2. Boot Entry Point (Most Important Startup File)\
+start_all.sh\
+\pard\pardeftab720\partightenfactor0
+
+\f1\b0 \cf2 Purpose:\
+This is what turns Mini Jarvis into an appliance.\
+It performs:\
+- Sets the display environment with DISPLAY=:0\
+- Moves into the Mini Jarvis project directory\
+- Activates the Python virtual environment\
+- Waits briefly for system readiness\
+- Warms the default Fast model into memory\
+- Launches the GUI by running jarvis_ui.py\
+Current important behavior:\
+- Only the Fast model is warmed at startup.\
+- The Deep model is not preloaded at boot yet.\
+- Qwen3 loads later when selected from the GUI Deep mode dropdown.\
+\pard\pardeftab720\partightenfactor0
+
+\f0\b \cf2 This is the single entry point for normal startup.\
+\
+3. Systemd Service (Boot Automation)\
+jarvis.service\
+\pard\pardeftab720\partightenfactor0
+
+\f1\b0 \cf2 Location:\
+\pard\pardeftab720\partightenfactor0
+
+\f2\fs20 \cf2 /home/minijarvis/.config/systemd/user/jarvis.service\
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs22 \cf2 Purpose:\
+Controls:\
+- When Mini Jarvis starts\
+- How it runs\
+- Restart behavior if the GUI exits\
+It tells the system:\
+\pard\pardeftab720\partightenfactor0
+
+\f2\fs20 \cf2 Run start_all.sh automatically at login\
+\pard\pardeftab720\partightenfactor0
+
+\f0\b\fs22 \cf2 This replaced less reliable desktop autostart behavior and is part of the appliance-style boot design.\
+\
+\pard\pardeftab720\partightenfactor0
+
+\fs26 \cf2 4. AI Models (Managed by Ollama)\
+Models are stored internally by Ollama, not inside the project folder.\
+Approved GUI Models:\
+\
+Fast - Qwen 2.5 3B\
+\pard\pardeftab720\partightenfactor0
+
+\f2\b0\fs20 \cf2 qwen2.5:3b-instruct-q8_0\
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs22 \cf2 Purpose:\
+- Default startup model\
+- Fast\
+- Stable\
+- Cool-running\
+- Safest appliance default\
+\
+\pard\pardeftab720\partightenfactor0
+
+\f0\b \cf2 Deep - Qwen 3 8B\
+\pard\pardeftab720\partightenfactor0
+
+\f2\b0\fs20 \cf2 qwen3:8b-q4_K_M\
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs22 \cf2 Purpose:\
+- Selectable from the GUI dropdown\
+- Better answers and deeper reasoning\
+- Slower and heavier than Qwen2.5\
+- Approved only through the HTTP API path with think=False\
+\pard\pardeftab720\partightenfactor0
+
+\f0\b \cf2 Hidden / Installed but Not Approved in GUI:\
+\pard\pardeftab720\partightenfactor0
+
+\f2\b0\fs20 \cf2 tinyllama:latest\
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs22 \cf2 Reason:\
+- Installed but hidden from the GUI dropdown\
+- Removed from GUI use because of unstable display behavior and poor prompt-format behavior\
+\
+\pard\pardeftab720\partightenfactor0
+
+\f0\b\fs26 \cf2 5. Ollama Service (System-Level AI Engine)\
+\pard\pardeftab720\partightenfactor0
+
+\f1\b0 \cf2 Service Name:\
+\pard\pardeftab720\partightenfactor0
+
+\f2\fs20 \cf2 ollama\
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs22 \cf2 Managed by:\
+\pard\pardeftab720\partightenfactor0
+
+\f2\fs20 \cf2 sudo systemctl status ollama\
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs22 \cf2 Purpose:\
+- Runs the local AI engine\
+- Hosts the local Ollama API\
+- Maintains model lifecycle\
+- Keeps loaded models available according to keep-alive configuration\
+Local API used by Mini Jarvis:\
+\pard\pardeftab720\partightenfactor0
+
+\f2\fs20 \cf2 http://127.0.0.1:11434/api/generate\
+\
+\pard\pardeftab720\partightenfactor0
+
+\f0\b\fs26 \cf2 6. Ollama Keep-Alive Override\
+\pard\pardeftab720\partightenfactor0
+
+\f1\b0 \cf2 Location:\
+\pard\pardeftab720\partightenfactor0
+
+\f2\fs20 \cf2 /etc/systemd/system/ollama.service.d/override.conf\
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs22 \cf2 Purpose:\
+Keeps loaded Ollama models resident for 24 hours so they do not unload quickly during normal use.\
+Current setting:\
+\pard\pardeftab720\partightenfactor0
+
+\f2\fs20 \cf2 Environment="OLLAMA_KEEP_ALIVE=24h"\
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs22 \cf2 Important:\
+- This helps keep Qwen2.5 resident after startup.\
+- It also allows Qwen3 to remain resident after first Deep-mode use.\
+- Do not change this unless a future phase specifically calls for it.\
+\
+\pard\pardeftab720\partightenfactor0
+
+\f0\b\fs26 \cf2 7. Python Environment\
+\pard\pardeftab720\partightenfactor0
+
+\f1\b0 \cf2 Folder:\
+\pard\pardeftab720\partightenfactor0
+
+\f2\fs20 \cf2 /home/minijarvis/minijarvis/venv\
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs22 \cf2 Purpose:\
+- Contains all Python dependencies\
+- Provides an isolated runtime environment\
+- Prevents Python package conflicts with the base operating system\
+\pard\pardeftab720\partightenfactor0
+
+\f0\b \cf2 Tkinter is provided through operating-system packages, not pip.\
+\
+\pard\pardeftab720\partightenfactor0
+
+\fs26 \cf2 8. Conversation Logs\
+\pard\pardeftab720\partightenfactor0
+
+\f1\b0 \cf2 Folder:\
+\pard\pardeftab720\partightenfactor0
+
+\f2\fs20 \cf2 /home/minijarvis/minijarvis/logs/conversations/\
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs22 \cf2 Purpose:\
+- Stores local conversation logs\
+- Uses one log file per day\
+- Includes model metadata for each exchange\
+- Maintains a rolling 60-day history\
+Daily file format:\
+\pard\pardeftab720\partightenfactor0
+
+\f2\fs20 \cf2 conversation_YYYY-MM-DD.txt\
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs22 \cf2 Retention:\
+\pard\pardeftab720\partightenfactor0
+
+\f2\fs20 \cf2 60 days\
+\pard\pardeftab720\partightenfactor0
+
+\f0\b\fs22 \cf2 Phase 17R logging policy:\
+\pard\pardeftab720\partightenfactor0
+
+\f1\b0 \cf2 Conversation logging is now best-effort and non-fatal. If log writing fails, Mini Jarvis should still display the model response and continue operating.\
+\pard\pardeftab720\partightenfactor0
+
+\f0\b \cf2 A logging exception may show a warning in the GUI, but it must not break the response flow.\
+\
+\pard\pardeftab720\partightenfactor0
+
+\fs26 \cf2 9. Optional / Legacy Files\
+\pard\pardeftab720\partightenfactor0
+
+\f1\b0 \cf2 If still present:\
+- stream_test.py - early streaming test\
+- gui_test.py - GUI smoke test\
+\pard\pardeftab720\partightenfactor0
+
+\f0\b \cf2 These were useful during early development and are safe to remove if they are still present and no current phase depends on them.\
+\
+10. How Everything Connects\
+Boot Flow (Critical Mental Model)\
+\pard\pardeftab720\partightenfactor0
+
+\f2\b0\fs20 \cf2 systemd user service (jarvis.service)\
+        |\
+start_all.sh\
+        |\
+Activates Python virtual environment\
+        |\
+Warms Fast model only:\
+qwen2.5:3b-instruct-q8_0\
+        |\
+Launches jarvis_ui.py\
+        |\
+User interacts with GUI\
+        |\
+User may select Fast or Deep model from dropdown\
+\
+\pard\pardeftab720\partightenfactor0
+
+\f0\b\fs22 \cf2 Runtime AI Flow\
+\pard\pardeftab720\partightenfactor0
+
+\f2\b0\fs20 \cf2 jarvis_ui.py\
+        |\
+Ollama HTTP API\
+        |\
+Selected local model\
+        |\
+Streaming response\
+        |\
+Tkinter GUI output area\
+        |\
+Best-effort conversation log\
+\
+\pard\pardeftab720\partightenfactor0
+
+\f0\b\fs26 \cf2 11. If Something Breaks - Where to Look\
+\pard\pardeftab720\partightenfactor0
+
+\f1\b0 \cf2 UI not opening:\
+\pard\pardeftab720\partightenfactor0
+
+\f2\fs20 \cf2 start_all.sh, jarvis.service\
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs22 \cf2 AI not responding:\
+\pard\pardeftab720\partightenfactor0
+
+\f2\fs20 \cf2 ollama service\
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs22 \cf2 Responses weird:\
+\pard\pardeftab720\partightenfactor0
+
+\f2\fs20 \cf2 jarvis_ui.py\
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs22 \cf2 Model dropdown or model behavior wrong:\
+\pard\pardeftab720\partightenfactor0
+
+\f2\fs20 \cf2 jarvis_ui.py\
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs22 \cf2 Deep mode showing Thinking text:\
+\pard\pardeftab720\partightenfactor0
+
+\f2\fs20 \cf2 jarvis_ui.py - verify Qwen3 payload includes think=False\
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs22 \cf2 Conversation logs missing or warning appears:\
+\pard\pardeftab720\partightenfactor0
+
+\f2\fs20 \cf2 logs/conversations/, jarvis_ui.py logging block\
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs22 \cf2 Model unloading:\
+\pard\pardeftab720\partightenfactor0
+
+\f2\fs20 \cf2 /etc/systemd/system/ollama.service.d/override.conf\
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs22 \cf2 Boot issues:\
+\pard\pardeftab720\partightenfactor0
+
+\f2\fs20 \cf2 jarvis.service, start_all.sh\
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs22 \cf2 SSH access problems:\
+\pard\pardeftab720\partightenfactor0
+
+\f2\fs20 \cf2 Future SSH Repair Phase - not yet resolved in the current project state\
+\
+\pard\pardeftab720\partightenfactor0
+
+\f0\b\fs26 \cf2 12. Current Caution / Editing Discipline\
+\pard\pardeftab720\partightenfactor0
+
+\f1\b0 \cf2 - Do not edit startup, systemd, or Ollama files unless the current phase specifically requires it.\
+- Most GUI behavior changes belong in jarvis_ui.py.\
+- Most startup behavior changes belong in start_all.sh.\
+- Most boot automation issues belong in jarvis.service.\
+- Back up the target file before changing it.\
+- Make one focused change at a time.\
+- Prefer temp-script patching over fragile inline sed commands.\
+- Syntax check after patching.\
+- Restart only the necessary service.\
+- Validate behavior immediately and report PASS or FAIL.\
+\
+\pard\pardeftab720\partightenfactor0
+
+\f0\b \cf2 13. Key Insight\
+You still have a very clean architecture:\
+\pard\pardeftab720\partightenfactor0
+
+\f1\b0 \cf2 - One core app: jarvis_ui.py\
+- One startup controller: start_all.sh\
+- One system trigger: jarvis.service\
+- One local AI engine: Ollama\
+- Two approved GUI models: Fast Qwen2.5 and Deep Qwen3\
+- One local conversation log area with 60-day cleanup\
+- One important Phase 17R safety rule: logging failure must not interrupt a valid model response}

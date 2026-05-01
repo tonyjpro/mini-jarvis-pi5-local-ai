@@ -1,0 +1,161 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2867
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\froman\fcharset0 Times-Bold;\f1\froman\fcharset0 Times-Roman;\f2\fnil\fcharset0 Calibri-Bold;
+\f3\fswiss\fcharset0 Helvetica;\f4\fmodern\fcharset0 CourierNewPSMT;}
+{\colortbl;\red255\green255\blue255;\red14\green45\blue72;\red0\green0\blue0;\red42\green75\blue126;
+\red209\green229\blue245;\red227\green242\blue229;}
+{\*\expandedcolortbl;;\cssrgb\c5882\c23529\c35294;\cssrgb\c0\c0\c0;\cssrgb\c21176\c37255\c56863;
+\cssrgb\c85098\c91765\c96863;\cssrgb\c90980\c95686\c91765;}
+\margl1080\margr1080\margb1008\margt1008
+\deftab720
+\pard\pardeftab720\sl276\slmult1\sa200\qc\partightenfactor0
+
+\f0\b\fs40 \cf2 \up0 \nosupersub \ulnone Mini Jarvis: Offline AI on a Raspberry Pi 5
+\f1\b0\fs21 \cf3 \
+\pard\pardeftab720\sl276\slmult1\sa200\qc\partightenfactor0
+
+\f0\b\fs28 \cf3 Source Code Addendum for Vilros Spotlight Packet
+\f1\b0\fs21 \
+\pard\pardeftab720\sl276\slmult1\sa480\qc\partightenfactor0
+
+\fs22 \cf3 Creator: Tony Provenzano
+\fs21 \
+\pard\pardeftab720\sl276\slmult1\partightenfactor0
+
+\f2\b\fs28 \cf4 Purpose of This Addendum\
+\pard\pardeftab720\sl276\slmult1\sa200\partightenfactor0
+
+\f0\fs21 \cf3 This addendum is intended to sit behind the public-facing Vilros spotlight materials as an optional technical teaching supplement. 
+\f1\b0 The main spotlight packet should lead with the project story, hardware, photos, conceptual build guide, and bill of materials. The actual source files should be presented only as optional educational reference for readers who want to understand how the appliance-style Mini Jarvis workflow was organized.\
+\pard\pardeftab720\sl276\slmult1\sa480\partightenfactor0
+
+\f0\b \cf3 Recommended use: 
+\f1\b0 include this addendum after the public project materials, or attach it as a separate optional technical appendix. \
+\pard\pardeftab720\sl276\slmult1\partightenfactor0
+
+\f2\b\fs28 \cf4 Recommended Positioning\
+\pard\pardeftab720\sl276\slmult1\sa200\partightenfactor0
+
+\f0\fs21 \cf3 Public wording: 
+\f1\b0 A small source-file appendix is available for educational reference only.\
+\pard\pardeftab720\sl276\slmult1\sa480\partightenfactor0
+
+\f0\b \cf3 Important boundary: 
+\f1\b0 This addendum should not include conversation logs, private troubleshooting notes, IP addresses, SSH repair details, or internal phase history. It should only explain the clean current project structure and the source files that are useful for teaching.\
+\pard\pardeftab720\sl276\slmult1\sa480\partightenfactor0
+
+\f2\b\fs28 \cf4 Recommended Source Files to Include\
+
+\itap1\trowd \taflags1 \trgaph108\trleft-108 \trbrdrt\brdrnil \trbrdrl\brdrnil \trbrdrr\brdrnil 
+\clvertalc \clcbpat5 \clwWidth1840\clftsWidth3 \clheight260 \clbrdrt\brdrs\brdrw20\brdrcf3 \clbrdrl\brdrs\brdrw20\brdrcf3 \clbrdrb\brdrs\brdrw20\brdrcf3 \clbrdrr\brdrs\brdrw20\brdrcf3 \clpadt80 \clpadl80 \clpadb80 \clpadr80 \gaph\cellx2880
+\clvertalc \clcbpat5 \clwWidth1880\clftsWidth3 \clheight260 \clbrdrt\brdrs\brdrw20\brdrcf3 \clbrdrl\brdrs\brdrw20\brdrcf3 \clbrdrb\brdrs\brdrw20\brdrcf3 \clbrdrr\brdrs\brdrw20\brdrcf3 \clpadt80 \clpadl80 \clpadb80 \clpadr80 \gaph\cellx5760
+\clvertalc \clcbpat5 \clwWidth5820\clftsWidth3 \clheight260 \clbrdrt\brdrs\brdrw20\brdrcf3 \clbrdrl\brdrs\brdrw20\brdrcf3 \clbrdrb\brdrs\brdrw20\brdrcf3 \clbrdrr\brdrs\brdrw20\brdrcf3 \clpadt80 \clpadl80 \clpadb80 \clpadr80 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\sl276\slmult1\sa200\partightenfactor0
+
+\f0\fs20 \cf3 File
+\f3\b0\fs24 \cf0 \up0 \nosupersub \ulnone \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+
+\f0\b\fs20 \cf3 \up0 \nosupersub \ulnone Include?
+\f3\b0\fs24 \cf0 \up0 \nosupersub \ulnone \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+
+\f0\b\fs20 \cf3 \up0 \nosupersub \ulnone Why
+\f3\b0\fs24 \cf0 \up0 \nosupersub \ulnone \cell \row
+
+\itap1\trowd \taflags1 \trgaph108\trleft-108 \trbrdrl\brdrnil \trbrdrr\brdrnil 
+\clvertalt \clcbpat6 \clwWidth1840\clftsWidth3 \clheight1020 \clbrdrt\brdrs\brdrw20\brdrcf3 \clbrdrl\brdrs\brdrw20\brdrcf3 \clbrdrb\brdrs\brdrw20\brdrcf3 \clbrdrr\brdrs\brdrw20\brdrcf3 \clpadt80 \clpadl80 \clpadb80 \clpadr80 \gaph\cellx2880
+\clvertalt \clcbpat6 \clwWidth1880\clftsWidth3 \clheight1020 \clbrdrt\brdrs\brdrw20\brdrcf3 \clbrdrl\brdrs\brdrw20\brdrcf3 \clbrdrb\brdrs\brdrw20\brdrcf3 \clbrdrr\brdrs\brdrw20\brdrcf3 \clpadt80 \clpadl80 \clpadb80 \clpadr80 \gaph\cellx5760
+\clvertalt \clcbpat6 \clwWidth5820\clftsWidth3 \clheight1020 \clbrdrt\brdrs\brdrw20\brdrcf3 \clbrdrl\brdrs\brdrw20\brdrcf3 \clbrdrb\brdrs\brdrw20\brdrcf3 \clbrdrr\brdrs\brdrw20\brdrcf3 \clpadt80 \clpadl80 \clpadb80 \clpadr80 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+
+\f1\fs20 \cf3 \up0 \nosupersub \ulnone jarvis_ui.py
+\f3\fs24 \cf0 \up0 \nosupersub \ulnone \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+
+\f1\fs20 \cf3 \up0 \nosupersub \ulnone Yes, optional appendix
+\f3\fs24 \cf0 \up0 \nosupersub \ulnone \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+
+\f1\fs20 \cf3 \up0 \nosupersub \ulnone This is the actual Mini Jarvis application. It demonstrates the Tkinter GUI, local Ollama API calls, model selector, streaming responses, status bar, conversation memory, local logging, 60-day log cleanup, and Qwen3 thinking suppression.
+\f3\fs24 \cf0 \up0 \nosupersub \ulnone \cell \row
+
+\itap1\trowd \taflags1 \trgaph108\trleft-108 \trbrdrl\brdrnil \trbrdrr\brdrnil 
+\clvertalt \clcbpat6 \clwWidth1840\clftsWidth3 \clheight780 \clbrdrt\brdrs\brdrw20\brdrcf3 \clbrdrl\brdrs\brdrw20\brdrcf3 \clbrdrb\brdrs\brdrw20\brdrcf3 \clbrdrr\brdrs\brdrw20\brdrcf3 \clpadt80 \clpadl80 \clpadb80 \clpadr80 \gaph\cellx2880
+\clvertalt \clcbpat6 \clwWidth1880\clftsWidth3 \clheight780 \clbrdrt\brdrs\brdrw20\brdrcf3 \clbrdrl\brdrs\brdrw20\brdrcf3 \clbrdrb\brdrs\brdrw20\brdrcf3 \clbrdrr\brdrs\brdrw20\brdrcf3 \clpadt80 \clpadl80 \clpadb80 \clpadr80 \gaph\cellx5760
+\clvertalt \clcbpat6 \clwWidth5820\clftsWidth3 \clheight780 \clbrdrt\brdrs\brdrw20\brdrcf3 \clbrdrl\brdrs\brdrw20\brdrcf3 \clbrdrb\brdrs\brdrw20\brdrcf3 \clbrdrr\brdrs\brdrw20\brdrcf3 \clpadt80 \clpadl80 \clpadb80 \clpadr80 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+
+\f1\fs20 \cf3 \up0 \nosupersub \ulnone start_all.sh
+\f3\fs24 \cf0 \up0 \nosupersub \ulnone \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+
+\f1\fs20 \cf3 \up0 \nosupersub \ulnone Yes
+\f3\fs24 \cf0 \up0 \nosupersub \ulnone \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+
+\f1\fs20 \cf3 \up0 \nosupersub \ulnone Shows the appliance-style startup flow: set the display environment, enter the project folder, activate the virtual environment, warm the default Fast model, and launch the GUI.
+\f3\fs24 \cf0 \up0 \nosupersub \ulnone \cell \row
+
+\itap1\trowd \taflags1 \trgaph108\trleft-108 \trbrdrl\brdrnil \trbrdrr\brdrnil 
+\clvertalt \clcbpat6 \clwWidth1840\clftsWidth3 \clheight500 \clbrdrt\brdrs\brdrw20\brdrcf3 \clbrdrl\brdrs\brdrw20\brdrcf3 \clbrdrb\brdrs\brdrw20\brdrcf3 \clbrdrr\brdrs\brdrw20\brdrcf3 \clpadt80 \clpadl80 \clpadb80 \clpadr80 \gaph\cellx2880
+\clvertalt \clcbpat6 \clwWidth1880\clftsWidth3 \clheight500 \clbrdrt\brdrs\brdrw20\brdrcf3 \clbrdrl\brdrs\brdrw20\brdrcf3 \clbrdrb\brdrs\brdrw20\brdrcf3 \clbrdrr\brdrs\brdrw20\brdrcf3 \clpadt80 \clpadl80 \clpadb80 \clpadr80 \gaph\cellx5760
+\clvertalt \clcbpat6 \clwWidth5820\clftsWidth3 \clheight500 \clbrdrt\brdrs\brdrw20\brdrcf3 \clbrdrl\brdrs\brdrw20\brdrcf3 \clbrdrb\brdrs\brdrw20\brdrcf3 \clbrdrr\brdrs\brdrw20\brdrcf3 \clpadt80 \clpadl80 \clpadb80 \clpadr80 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+
+\f1\fs20 \cf3 \up0 \nosupersub \ulnone jarvis.service
+\f3\fs24 \cf0 \up0 \nosupersub \ulnone \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+
+\f1\fs20 \cf3 \up0 \nosupersub \ulnone Yes
+\f3\fs24 \cf0 \up0 \nosupersub \ulnone \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+
+\f1\fs20 \cf3 \up0 \nosupersub \ulnone Shows the systemd user-service boot automation that starts Mini Jarvis reliably after the graphical session is available.
+\f3\fs24 \cf0 \up0 \nosupersub \ulnone \cell \row
+
+\itap1\trowd \taflags1 \trgaph108\trleft-108 \trbrdrl\brdrnil \trbrdrt\brdrnil \trbrdrr\brdrnil 
+\clvertalt \clcbpat6 \clwWidth1840\clftsWidth3 \clheight520 \clbrdrt\brdrs\brdrw20\brdrcf3 \clbrdrl\brdrs\brdrw20\brdrcf3 \clbrdrb\brdrs\brdrw20\brdrcf3 \clbrdrr\brdrs\brdrw20\brdrcf3 \clpadt80 \clpadl80 \clpadb80 \clpadr80 \gaph\cellx2880
+\clvertalt \clcbpat6 \clwWidth1880\clftsWidth3 \clheight520 \clbrdrt\brdrs\brdrw20\brdrcf3 \clbrdrl\brdrs\brdrw20\brdrcf3 \clbrdrb\brdrs\brdrw20\brdrcf3 \clbrdrr\brdrs\brdrw20\brdrcf3 \clpadt80 \clpadl80 \clpadb80 \clpadr80 \gaph\cellx5760
+\clvertalt \clcbpat6 \clwWidth5820\clftsWidth3 \clheight520 \clbrdrt\brdrs\brdrw20\brdrcf3 \clbrdrl\brdrs\brdrw20\brdrcf3 \clbrdrb\brdrs\brdrw20\brdrcf3 \clbrdrr\brdrs\brdrw20\brdrcf3 \clpadt80 \clpadl80 \clpadb80 \clpadr80 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+
+\f1\fs20 \cf3 \up0 \nosupersub \ulnone requirements.txt
+\f3\fs24 \cf0 \up0 \nosupersub \ulnone \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+
+\f1\fs20 \cf3 \up0 \nosupersub \ulnone Yes
+\f3\fs24 \cf0 \up0 \nosupersub \ulnone \cell 
+\pard\intbl\itap1\pardeftab720\partightenfactor0
+
+\f1\fs20 \cf3 \up0 \nosupersub \ulnone Shows the Python dependency set. This keeps the software requirements clear without exposing unnecessary system details.
+\f3\fs24 \cf0 \up0 \nosupersub \ulnone 
+\f2\b\fs28 \cf4 \up0 \nosupersub \ulnone \cell \lastrow\row
+\pard\pardeftab720\sl276\slmult1\partightenfactor0
+\cf4 Recommended Technical Addendum Folder\
+\pard\pardeftab720\sl276\slmult1\sa200\partightenfactor0
+
+\f0\fs21 \cf3 Folder layout:
+\f1\b0 \
+\pard\pardeftab720\li360\sl276\slmult1\sa480\partightenfactor0
+
+\f4\fs18 \cf3 Mini-Jarvis-Source-Addendum/\uc0\u8232   README_Source_Addendum.docx\u8232   source_files/\u8232     jarvis_ui.py\u8232     start_all.sh\u8232     jarvis.service\u8232     requirements.txt\u8232   notes/\u8232     File_Map_and_Usage_Notes.docx\u8232 
+\f1\fs21 \
+\pard\pardeftab720\sl276\slmult1\partightenfactor0
+
+\f2\b\fs28 \cf4 Code Files\
+\pard\tx360\pardeftab720\li360\sl276\slmult1\sa200\partightenfactor0
+
+\f1\b0\fs21 \cf3 Code provided as educational reference only.\
+\pard\pardeftab720\sl276\slmult1\sa480\partightenfactor0
+
+\f0\b \cf3 Suggested notice: 
+\f1\b0 These source files are provided as a personal-use maker reference for educational purposes. They are not presented as a commercial software product, an officially supported Vilros application, or a replacement for cloud AI services. Builders should adapt the concept to their own hardware, operating system, model choices, and safety requirements.\
+\pard\pardeftab720\sl276\slmult1\partightenfactor0
+
+\f2\b\fs28 \cf4 Code :\
+\pard\pardeftab720\sl276\slmult1\sa200\partightenfactor0
+
+\f1\b0\fs21 \cf3 jarvis_ui.py, \
+start_all.sh, \
+jarvis.service, \
+requirements.txt. }

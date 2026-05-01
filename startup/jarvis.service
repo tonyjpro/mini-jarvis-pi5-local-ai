@@ -1,0 +1,11 @@
+[Unit]
+Description=Mini Jarvis UI
+After=graphical-session.target
+
+[Service]
+ExecStart=/home/minijarvis/minijarvis/start_all.sh
+Restart=always
+Environment=DISPLAY=:0
+
+[Install]
+WantedBy=default.target

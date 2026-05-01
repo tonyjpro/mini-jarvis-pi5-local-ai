@@ -1,0 +1,1 @@
+console=serial0,115200 console=tty1 root=PARTUUID=3ad44b93-02 rootfstype=ext4 fsck.repair=yes rootwait quiet splash plymouth.ignore-serial-consoles ds=nocloud;i=rpi-imager-1777416695538 cfg80211.ieee80211_regdom=US usb-storage.quirks=152d:0562:u
