@@ -54,21 +54,17 @@ The Mini Jarvis GUI supports two approved models:
 | GUI Label | Ollama Model | Purpose |
 |---|---|---|
 | Fast - Qwen 2.5 3B | `qwen2.5:3b-instruct-q8_0` | Default fast model |
-| Deep - Qwen 3 8B | `qwen3:8b-q4_K_M` | Heavier reasoning model |
+| Deep - Qwen 3.5 4B | `qwen3.5:4b` | Validated Deep mode replacement |
 
 TinyLlama is installed in the documented build but intentionally hidden from the GUI because it was not approved for the final user-facing experience.
 
-## Qwen3 Thinking Suppression
+## Deep Mode Update
 
-Qwen3 can expose visible thinking text in some raw command-line usage. The Mini Jarvis GUI avoids this by using the Ollama HTTP API and setting:
+During post-submission testing, the original Deep model mapping, `qwen3:8b-q4_K_M`, proved unreliable in the Raspberry Pi 5 / Ollama 0.22.0 environment used by Mini Jarvis. The validated Deep mode replacement is now `qwen3.5:4b`.
 
-```python
-payload["think"] = False
-```
+Because Qwen-family models may expose `<think>...</think>` reasoning traces, Mini Jarvis does not rely only on prompting or Ollama `think:false`. The GUI also includes an output-layer cleaner that strips thinking traces before displaying responses or writing conversation logs.
 
-for the Qwen3 model.
-
-This is an important part of the final GUI behavior.
+See `docs/deep-mode-qwen35-fix.md` for the full fix details and validation checklist.
 
 ## Repository Structure
 
@@ -110,7 +106,7 @@ It handles:
 - Conversation memory
 - Conversation logging
 - 60-day log cleanup
-- Qwen3 `think=False` API behavior
+- Qwen3.5 Deep mode response cleaning and `think:false` API behavior
 - Non-fatal logging protection
 
 ### `startup/start_all.sh`

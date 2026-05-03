@@ -2,6 +2,7 @@ import tkinter as tk
 import requests
 import json
 import threading
+import re
 from pathlib import Path
 from datetime import datetime, timedelta
 
@@ -9,7 +10,7 @@ conversation_history = ""
 is_generating = False
 MODEL_OPTIONS = {
     "Fast - Qwen 2.5 3B": "qwen2.5:3b-instruct-q8_0",
-    "Deep - Qwen 3 8B": "qwen3:8b-q4_K_M",
+    "Deep - Qwen 3.5 4B": "qwen3.5:4b",
 }
 DEFAULT_MODEL_LABEL = "Fast - Qwen 2.5 3B"
 MODEL_NAME = MODEL_OPTIONS[DEFAULT_MODEL_LABEL]
@@ -23,6 +24,18 @@ TEXT_MAIN = "#d7f3ff"
 TEXT_MUTED = "#9fbfd0"
 ACCENT = "#35d0ff"
 ACCENT_DARK = "#145f75"
+
+
+
+def clean_model_response(text):
+    text = re.sub(r"<think>.*?</think>", "", text, flags=re.DOTALL | re.IGNORECASE)
+    text = re.sub(r"<think>.*$", "", text, flags=re.DOTALL | re.IGNORECASE)
+    text = re.sub(r"</think>", "", text, flags=re.IGNORECASE)
+    return text.strip()
+
+
+def is_deep_model(model_name):
+    return model_name == "qwen3.5:4b"
 
 
 def cleanup_old_logs():
@@ -59,7 +72,7 @@ def stream_ollama(prompt, model_name):
     url = "http://127.0.0.1:11434/api/generate"
 
     full_prompt = f"""
-You are a helpful assistant. Answer in clear English only. Keep answers concise (4-5 sentences).
+You are a helpful assistant. Answer in clear English only. Keep answers concise (4-5 sentences). Do not output thinking tags, hidden reasoning, analysis traces, or <think> blocks.
 
 Conversation so far:
 {conversation_history}
@@ -71,22 +84,30 @@ Assistant:
     payload = {
         "model": model_name,
         "prompt": full_prompt,
-        "stream": True
+        "stream": not is_deep_model(model_name)
     }
 
-    if model_name == "qwen3:8b-q4_K_M":
+    if is_deep_model(model_name):
         payload["think"] = False
 
-    response = requests.post(url, json=payload, stream=True)
+    response = requests.post(url, json=payload, stream=not is_deep_model(model_name))
+    response.raise_for_status()
 
     response_text = ""
 
-    for line in response.iter_lines():
-        if line:
-            data = json.loads(line.decode("utf-8"))
-            token = data.get("response", "")
-            response_text += token
-            yield token
+    if is_deep_model(model_name):
+        data = response.json()
+        response_text = clean_model_response(data.get("response", ""))
+        if response_text:
+            yield response_text
+    else:
+        for line in response.iter_lines():
+            if line:
+                data = json.loads(line.decode("utf-8"))
+                token = data.get("response", "")
+                response_text += token
+                yield token
+        response_text = clean_model_response(response_text)
 
     model_label = next((label for label, exact_name in MODEL_OPTIONS.items() if exact_name == model_name), model_name)
     conversation_history += f"\nUser: {prompt}\nAssistant: {response_text}"
