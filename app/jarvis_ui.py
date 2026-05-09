@@ -2,7 +2,9 @@ import tkinter as tk
 import requests
 import json
 import threading
+import subprocess
 import re
+from tkinter import messagebox
 from pathlib import Path
 from datetime import datetime, timedelta
 
@@ -297,11 +299,103 @@ def send_prompt(event=None):
     thread.start()
 
 
+
+def confirm_shutdown():
+    dialog = tk.Toplevel(root)
+    dialog.title("Shut down Mini Jarvis?")
+    dialog.configure(bg=BG_PANEL)
+    dialog.resizable(False, False)
+    dialog.transient(root)
+    dialog.grab_set()
+
+    container = tk.Frame(dialog, bg=BG_PANEL, padx=24, pady=18)
+    container.pack(fill=tk.BOTH, expand=True)
+
+    title_label = tk.Label(
+        container,
+        text="Shut down Mini Jarvis?",
+        font=("Arial", 16, "bold"),
+        bg=BG_PANEL,
+        fg=TEXT_MAIN
+    )
+    title_label.pack(pady=(0, 8))
+
+    message_label = tk.Label(
+        container,
+        text="This will safely power off the Raspberry Pi.",
+        font=("Arial", 12),
+        bg=BG_PANEL,
+        fg=TEXT_MUTED
+    )
+    message_label.pack(pady=(0, 18))
+
+    button_frame = tk.Frame(container, bg=BG_PANEL)
+    button_frame.pack(fill=tk.X)
+
+    def cancel_shutdown():
+        dialog.destroy()
+
+    def run_shutdown():
+        try:
+            shutdown_button.config(state=tk.DISABLED)
+            set_status("Shutting down")
+            subprocess.Popen(["sudo", "/usr/local/sbin/mini-jarvis-shutdown"])
+            dialog.destroy()
+        except Exception as exc:
+            shutdown_button.config(state=tk.NORMAL)
+            messagebox.showerror("Shutdown failed", f"Mini Jarvis could not start shutdown:\n{exc}")
+            set_status("Ready")
+
+    cancel_button = tk.Button(
+        button_frame,
+        text="Cancel",
+        font=("Arial", 12),
+        command=cancel_shutdown,
+        cursor="left_ptr",
+        bg=BG_INPUT,
+        fg=TEXT_MAIN,
+        activebackground=ACCENT_DARK,
+        activeforeground=TEXT_MAIN,
+        relief=tk.FLAT,
+        padx=14,
+        pady=5
+    )
+    cancel_button.pack(side=tk.LEFT, padx=(0, 10))
+
+    confirm_button = tk.Button(
+        button_frame,
+        text="Shut Down",
+        font=("Arial", 12, "bold"),
+        command=run_shutdown,
+        cursor="left_ptr",
+        bg=ACCENT_DARK,
+        fg=TEXT_MAIN,
+        activebackground=ACCENT,
+        activeforeground=BG_DARK,
+        relief=tk.FLAT,
+        padx=14,
+        pady=5
+    )
+    confirm_button.pack(side=tk.RIGHT)
+
+    dialog.update_idletasks()
+    root_x = root.winfo_rootx()
+    root_y = root.winfo_rooty()
+    root_w = root.winfo_width()
+    root_h = root.winfo_height()
+    dialog_w = dialog.winfo_width()
+    dialog_h = dialog.winfo_height()
+    pos_x = root_x + (root_w // 2) - (dialog_w // 2)
+    pos_y = root_y + (root_h // 2) - (dialog_h // 2)
+    dialog.geometry(f"+{pos_x}+{pos_y}")
+    dialog.wait_window()
+
+
 cleanup_old_logs()
 
 root = tk.Tk()
 root.title("Mini Jarvis")
-root.geometry("900x700")
+root.geometry("1000x760")
 root.configure(bg=BG_DARK)
 
 selected_model_label = tk.StringVar(value=DEFAULT_MODEL_LABEL)
@@ -345,7 +439,45 @@ entry = tk.Entry(input_frame, font=("Arial", 16), bg=BG_INPUT, fg=TEXT_MAIN, ins
 entry.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(10, 5), pady=10)
 entry.bind("<Return>", send_prompt)
 
-model_menu = tk.OptionMenu(input_frame, selected_model_label, *MODEL_OPTIONS.keys())
+send_button = tk.Button(input_frame, text="Send", font=("Arial", 14), command=send_prompt, cursor="left_ptr", bg=ACCENT_DARK, fg=TEXT_MAIN, activebackground=ACCENT, activeforeground=BG_DARK, relief=tk.FLAT, padx=16, pady=4)
+send_button.pack(side=tk.RIGHT, padx=(5, 10), pady=10)
+
+# Status and appliance control bar
+status_frame = tk.Frame(root, bg=BG_PANEL, cursor="left_ptr")
+status_frame.pack(fill=tk.X)
+status_frame.grid_columnconfigure(0, weight=1)
+status_frame.grid_columnconfigure(1, weight=0)
+status_frame.grid_columnconfigure(2, weight=1)
+
+status_label = tk.Label(
+    status_frame,
+    text=f"Status: Ready | Model: {DEFAULT_MODEL_LABEL}",
+    anchor="w",
+    font=("Arial", 11),
+    bg=BG_PANEL,
+    fg=TEXT_MUTED,
+    padx=10,
+    pady=4
+)
+status_label.grid(row=0, column=0, sticky="ew", padx=(0, 8))
+
+shutdown_button = tk.Button(
+    status_frame,
+    text="Shutdown",
+    font=("Arial", 11),
+    command=confirm_shutdown,
+    cursor="left_ptr",
+    bg=BG_INPUT,
+    fg=TEXT_MAIN,
+    activebackground=ACCENT_DARK,
+    activeforeground=TEXT_MAIN,
+    relief=tk.FLAT,
+    padx=14,
+    pady=3
+)
+shutdown_button.grid(row=0, column=1, padx=24, pady=5)
+
+model_menu = tk.OptionMenu(status_frame, selected_model_label, *MODEL_OPTIONS.keys())
 model_menu.config(
     font=("Arial", 12),
     bg=BG_INPUT,
@@ -364,26 +496,7 @@ model_menu["menu"].config(
     activebackground=ACCENT_DARK,
     activeforeground=TEXT_MAIN
 )
-model_menu.pack(side=tk.LEFT, padx=(5, 5), pady=10)
-
-send_button = tk.Button(input_frame, text="Send", font=("Arial", 14), command=send_prompt, cursor="left_ptr", bg=ACCENT_DARK, fg=TEXT_MAIN, activebackground=ACCENT, activeforeground=BG_DARK, relief=tk.FLAT, padx=16, pady=4)
-send_button.pack(side=tk.RIGHT, padx=(5, 10), pady=10)
-
-# Status bar
-status_frame = tk.Frame(root, bg=BG_PANEL, cursor="left_ptr")
-status_frame.pack(fill=tk.X)
-
-status_label = tk.Label(
-    status_frame,
-    text=f"Status: Ready | Model: {DEFAULT_MODEL_LABEL}",
-    anchor="w",
-    font=("Arial", 11),
-    bg=BG_PANEL,
-    fg=TEXT_MUTED,
-    padx=10,
-    pady=4
-)
-status_label.pack(fill=tk.X)
+model_menu.grid(row=0, column=2, sticky="e", padx=(8, 10), pady=5)
 
 text_area.insert(tk.END, "Mini Jarvis is online.\n")
 text_area.insert(tk.END, f"Default AI model: {DEFAULT_MODEL_LABEL} -> {MODEL_OPTIONS[DEFAULT_MODEL_LABEL]}\n")
