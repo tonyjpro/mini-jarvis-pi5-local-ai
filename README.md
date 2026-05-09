@@ -256,3 +256,11 @@ Current documented state:
 This project is shared as a learning and review package. It is not a one-click installer. The documentation is included to explain the build decisions, architecture, hardening steps, and operational lessons learned.
 
 The most important practical lesson from the build is that a Raspberry Pi 5 local AI appliance can work well, but storage reliability, cooling, startup automation, and model behavior all matter.
+
+## Deep Mode Streaming Repair
+
+Mini Jarvis Deep Mode now uses Ollama `/api/chat` with `think:false` and `stream:true`, while Fast Mode remains on the proven `/api/generate` streaming path.
+
+This repair prevents the GUI from appearing frozen during Deep Mode responses and preserves the mandatory app-level thinking-trace cleanup before display and logging.
+
+See: `docs/deep-mode-streaming-repair.md`

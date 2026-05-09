@@ -71,3 +71,13 @@ Status: validated in Mini Jarvis Phase 21G and synchronized into the public GitH
 The public Deep mode default is now `qwen3.5:4b`.
 
 The old broken public Deep model mapping `qwen3:8b-q4_K_M` has been removed from `app/jarvis_ui.py`.
+
+## Phase 24 Streaming Follow-Up
+
+A later Phase 24 repair changed only the Deep Mode transport path from the non-streamed full-response Deep path to Ollama `/api/chat` with `think:false` and `stream:true`.
+
+Fast Mode remains on `/api/generate` streaming.
+
+Deep Mode now streams visible answer content into the GUI and keeps app-level thinking-trace cleanup active before display and logging.
+
+See also: `docs/deep-mode-streaming-repair.md`

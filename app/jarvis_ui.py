@@ -69,9 +69,117 @@ def append_conversation_log(prompt, response_text, model_label, model_name):
 def stream_ollama(prompt, model_name):
     global conversation_history
 
-    url = "http://127.0.0.1:11434/api/generate"
+    response_text = ""
 
-    full_prompt = f"""
+    if is_deep_model(model_name):
+        url = "http://127.0.0.1:11434/api/chat"
+
+        system_message = (
+            "You are a helpful assistant. Answer the user's latest message directly. "
+            "Answer in clear English only. Keep answers concise unless the user asks for detail. "
+            "Do not output hidden reasoning, analysis traces, thinking content, or <think> blocks. "
+            "Give only the final answer."
+        )
+
+        messages = [
+            {
+                "role": "system",
+                "content": system_message
+            }
+        ]
+
+        if conversation_history.strip():
+            messages.append(
+                {
+                    "role": "user",
+                    "content": "Recent conversation context, for reference only:\n" + conversation_history.strip()
+                }
+            )
+
+        messages.append(
+            {
+                "role": "user",
+                "content": prompt
+            }
+        )
+
+        payload = {
+            "model": model_name,
+            "messages": messages,
+            "think": False,
+            "stream": True
+        }
+
+        response = requests.post(url, json=payload, stream=True)
+        response.raise_for_status()
+
+        in_think_block = False
+        pending_tag = ""
+
+        def filter_visible_text(piece):
+            nonlocal in_think_block
+            nonlocal pending_tag
+
+            visible = []
+
+            for ch in piece:
+                if in_think_block:
+                    if pending_tag:
+                        pending_tag += ch
+                        lower_tag = pending_tag.lower()
+                        if "</think>".startswith(lower_tag):
+                            if lower_tag == "</think>":
+                                in_think_block = False
+                                pending_tag = ""
+                        else:
+                            pending_tag = ""
+                    elif ch == "<":
+                        pending_tag = "<"
+                    continue
+
+                if pending_tag:
+                    pending_tag += ch
+                    lower_tag = pending_tag.lower()
+                    if "<think>".startswith(lower_tag):
+                        if lower_tag == "<think>":
+                            in_think_block = True
+                            pending_tag = ""
+                    else:
+                        visible.append(pending_tag)
+                        pending_tag = ""
+                    continue
+
+                if ch == "<":
+                    pending_tag = "<"
+                else:
+                    visible.append(ch)
+
+            return "".join(visible)
+
+        for line in response.iter_lines():
+            if not line:
+                continue
+
+            data = json.loads(line.decode("utf-8"))
+
+            message = data.get("message", {})
+            token = message.get("content", "")
+
+            if token:
+                visible_token = filter_visible_text(token)
+                if visible_token:
+                    response_text += visible_token
+                    yield visible_token
+
+            if data.get("done"):
+                break
+
+        response_text = clean_model_response(response_text)
+
+    else:
+        url = "http://127.0.0.1:11434/api/generate"
+
+        full_prompt = f"""
 You are a helpful assistant. Answer in clear English only. Keep answers concise (4-5 sentences). Do not output thinking tags, hidden reasoning, analysis traces, or <think> blocks.
 
 Conversation so far:
@@ -81,32 +189,22 @@ User: {prompt}
 Assistant:
 """
 
-    payload = {
-        "model": model_name,
-        "prompt": full_prompt,
-        "stream": not is_deep_model(model_name)
-    }
+        payload = {
+            "model": model_name,
+            "prompt": full_prompt,
+            "stream": True
+        }
 
-    if is_deep_model(model_name):
-        payload["think"] = False
+        response = requests.post(url, json=payload, stream=True)
+        response.raise_for_status()
 
-    response = requests.post(url, json=payload, stream=not is_deep_model(model_name))
-    response.raise_for_status()
-
-    response_text = ""
-
-    if is_deep_model(model_name):
-        data = response.json()
-        response_text = clean_model_response(data.get("response", ""))
-        if response_text:
-            yield response_text
-    else:
         for line in response.iter_lines():
             if line:
                 data = json.loads(line.decode("utf-8"))
                 token = data.get("response", "")
                 response_text += token
                 yield token
+
         response_text = clean_model_response(response_text)
 
     model_label = next((label for label, exact_name in MODEL_OPTIONS.items() if exact_name == model_name), model_name)
